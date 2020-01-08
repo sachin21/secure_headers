@@ -74,7 +74,7 @@ module SecureHeaders
       end
 
       it "flags SameSite=Lax when configured with a boolean" do
-        cookie = Cookie.new(raw_cookie, samesite: { lax: true}, secure: OPT_OUT, httponly: OPT_OUT)
+        cookie = Cookie.new(raw_cookie, samesite: { lax: true }, secure: OPT_OUT, httponly: OPT_OUT)
         expect(cookie.to_s).to eq("_session=thisisatest; SameSite=Lax")
       end
 
@@ -96,6 +96,21 @@ module SecureHeaders
       it "flags SameSite=Strict when configured with a boolean" do
         cookie = Cookie.new(raw_cookie, {samesite: { strict: true}, secure: OPT_OUT, httponly: OPT_OUT})
         expect(cookie.to_s).to eq("_session=thisisatest; SameSite=Strict")
+      end
+
+      it "flags SameSite=None" do
+        cookie = Cookie.new(raw_cookie, samesite: { none: { only: ["_session"] } }, secure: OPT_OUT, httponly: OPT_OUT)
+        expect(cookie.to_s).to eq("_session=thisisatest; SameSite=None")
+      end
+
+      it "does not flag cookies as SameSite=None when excluded" do
+        cookie = Cookie.new(raw_cookie, samesite: { none: { except: ["_session"] } }, secure: OPT_OUT, httponly: OPT_OUT)
+        expect(cookie.to_s).to eq("_session=thisisatest")
+      end
+
+      it "flags SameSite=None when configured with a boolean" do
+        cookie = Cookie.new(raw_cookie, samesite: { none: true }, secure: OPT_OUT, httponly: OPT_OUT)
+        expect(cookie.to_s).to eq("_session=thisisatest; SameSite=None")
       end
 
       it "flags properly when both lax and strict are configured" do
